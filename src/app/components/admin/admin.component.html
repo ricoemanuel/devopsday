@@ -37,8 +37,11 @@
         </tbody>
     </table>
 </div>
+<div class="centrar">
+    <button class="btn btn-success"  (click)="exporter.exportTable('xlsx')">Exportar</button>
+</div>
 <div class="mat-elevation-z8 overflow-auto col-md-11 datatable">
-    <table mat-table [dataSource]="dataSource" matSort>
+    <table matTableExporter #exporter="matTableExporter" mat-table [dataSource]="dataSource" matSort>
 
         <ng-container matColumnDef="QR">
             <mat-header-cell *matHeaderCellDef> Código qr </mat-header-cell>
@@ -62,14 +65,16 @@
         <ng-container matColumnDef="Valor">
             <mat-header-cell *matHeaderCellDef> Valor </mat-header-cell>
             <mat-cell *matCellDef="let elemento"> {{
-                ((elemento.transaccion.data.transaction.amount_in_cents)/100).toLocaleString('en-US', {
+                ((elemento.transaccion.data?elemento.transaccion.data.transaction.amount_in_cents:elemento.transaccion.transaction.amount_in_cents)/100).toLocaleString('en-US', {
                 style: 'currency', currency: 'USD' })}}
             </mat-cell>
         </ng-container>
         <ng-container matColumnDef="Nombre">
             <mat-header-cell *matHeaderCellDef> Nombre </mat-header-cell>
             <mat-cell *matCellDef="let elemento"> {{
-                elemento.transaccion.data.transaction.customer_data.full_name}}
+
+                (elemento.transaccion.data?elemento.transaccion.data.transaction.customer_data.full_name:elemento.transaccion.transaction.customer_data.full_name)
+               }}
             </mat-cell>
         </ng-container>
         <ng-container matColumnDef="personas">
@@ -83,13 +88,25 @@
         <ng-container matColumnDef="transaccion">
             <mat-header-cell *matHeaderCellDef>Número de transacción</mat-header-cell>
             <mat-cell *matCellDef="let elemento">
-                {{elemento.transaccion.data.transaction.id}}
+                {{elemento.transaccion.data?elemento.transaccion.data.transaction.id:elemento.transaccion.transaction.id}}
             </mat-cell>
         </ng-container>
         <ng-container matColumnDef="fecha">
             <mat-header-cell *matHeaderCellDef>Fecha de transacción</mat-header-cell>
             <mat-cell *matCellDef="let elemento">
-                {{formatfecha(elemento.transaccion.data.transaction.finalized_at)}}
+                {{formatfecha(elemento.transaccion.data?elemento.transaccion.data.transaction.finalized_at:elemento.transaccion.transaction.finalized_at)}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="celular">
+            <mat-header-cell *matHeaderCellDef>Celular</mat-header-cell>
+            <mat-cell *matCellDef="let elemento">
+                {{elemento.transaccion.data?elemento.transaccion.data.transaction.customer_data.phone_number:elemento.transaccion.transaction.customer_data.phone_number}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="correo">
+            <mat-header-cell *matHeaderCellDef>Correo</mat-header-cell>
+            <mat-cell *matCellDef="let elemento">
+                {{elemento.transaccion.data?elemento.transaccion.data.transaction.customer_email:elemento.transaccion.transaction.customer_email}}
             </mat-cell>
         </ng-container>
 

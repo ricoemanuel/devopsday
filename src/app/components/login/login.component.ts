@@ -73,6 +73,7 @@ export class LoginComponent implements AfterViewInit {
 
         })
       } else {
+        console.log(e)
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
@@ -152,6 +153,7 @@ export class LoginComponent implements AfterViewInit {
             text: 'Correo inválido.',
           })
         } else {
+          console.log(error)
           Swal.fire({
             icon: 'error',
             title: 'Oops...',

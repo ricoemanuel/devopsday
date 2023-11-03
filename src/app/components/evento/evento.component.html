@@ -1,11 +1,14 @@
 <div class="spinner" *ngIf="spinner"><img src="../assets/spinner.gif" alt=""></div>
 <div *ngIf="!spinner">
-    <div *ngIf="id && evento" class="row margin">
+    <!-- <div class="mensaje_404">
+        Este evento se ha cancelado.
+    </div> -->
+     <div *ngIf="id && evento" class="row margin">
         <div class="col-md-3">
             <div class="img"><img width="250" src="../../../assets/rigo.jpg" alt=""></div>
 
         </div>
-        <div class="col-md-9 pt-3 margin-c">
+         <div class="col-md-9 pt-3 margin-c">
             <div class="card mx-auto">
                 <div class="card-body">
                     <h5 class="card-title">{{evento.nombre}}</h5>
@@ -57,12 +60,12 @@
 
             </div>
 
-        </div>
+        </div> 
         
     </div>
 
     <ng-template #template>
-        <div (click)="cerrarPopup({})" class="close"><mat-icon>close</mat-icon></div>
+        <div *ngIf="permitirCerrar" (click)="cerrarPopup({})" class="close"><mat-icon>close</mat-icon></div>
         <h3 class="title">{{selectedZone}}</h3>
         <app-grid-asientos (cerrarPopUpA)="cerrarPopup($event)" [labels]="evento.labels" 
             [zonaSeleccionada]="selectedZone"></app-grid-asientos>

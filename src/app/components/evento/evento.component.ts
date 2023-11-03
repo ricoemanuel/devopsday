@@ -32,7 +32,7 @@ export class EventoComponent implements OnInit, OnDestroy, AfterViewInit {
     private wompi: WompiService,
     protected _sanitizer: DomSanitizer,
     private cdRef: ChangeDetectorRef,
-    private el: ElementRef,private router: Router) {
+    private el: ElementRef, private router: Router) {
     this.id = this.aRoute.snapshot.paramMap.get('id');
   }
   ngAfterViewInit(): void {
@@ -87,7 +87,7 @@ export class EventoComponent implements OnInit, OnDestroy, AfterViewInit {
         this.matriz[asiento.fila][asiento.columna] = zona
       })
     })
-    
+
 
 
 
@@ -107,98 +107,102 @@ export class EventoComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
   }
-  permitirCerrar:boolean=true
+  permitirCerrar: boolean = true
   cerrarPopup(event: any) {
     this.modalService.hide()
   }
   async pagar(template: TemplateRef<any>) {
-
-    this.modalService.hide()
-    let asientos: string = '';
-    let suma = 0
-    this.listaAsientos.forEach((asiento: any) => {
-      let zona = this.evento.zonas.filter((zona: any) => {
-        return zona.nombreZona === asiento.nombreZona
-      })
-      zona = zona[0]
-      suma += zona.precioZona
-      asientos += `${asiento.nombreZona} ${this.evento.labels[asiento.fila]}-${asiento.label}, `
-    })
-    asientos = asientos.slice(0, -2)
-    let response = await this.wompi.generarLink(suma, asientos, this.user, this.evento.nombre);
-    response.subscribe(async (res: any) => {
-      let link: string = `https://checkout.wompi.co/l/${res.data.id}`
-      this.link = this._sanitizer.bypassSecurityTrustResourceUrl(link)
-      this.openModal(template)
-      this.vigilarPago(res.data.id)
-    })
-
-  }
-  vigilarPago(ref: string) {
-    this.suscriptionTransaccion = this.firebase.transactions().subscribe(async res => {
-      let iterable = Object.entries(res);
-      let array: any[] = [];
-
-      iterable.forEach(([key, transaccion]: any) => {
-        transaccion.key = key;
-        array.push(transaccion);
-      });
-
-
-
-      let respuesta = array.filter(pago => {
-        return pago.data.transaction.payment_link_id === ref
-      })
-      if (respuesta.length > 0) {
-
-        await this.aprobarSillas(respuesta[0])
-        this.modalService.hide()
-        return
-
-      }
-    })
-  }
-  async aprobarSillas(transaccion: any) {
     this.permitirCerrar=false
-    this.suscriptionTransaccion.unsubscribe()
-    Swal.fire({
-      position: 'top-end',
-      icon: 'success',
-      title: 'Validando compra, por favor espere.',
-      showConfirmButton: false,
+    let asientosIds: string[] = []
+    this.listaAsientos.map(async (asiento: any) => {
+      asientosIds.push(`${asiento.nombreZona},f${asiento.fila}c${asiento.columna}-${asiento.evento}/${this.evento.labels[asiento.fila]}-${asiento.label}`)
+      asiento.clienteEstado = "pagando"
+      await this.firebase.actualizarAsiento(asiento)
     })
-    if (transaccion.data.transaction.status === 'APPROVED') {
-      let asientosIds: string[] = []
-      await this.listaAsientos.forEach(async asiento => {
-        asientosIds.push(`${asiento.nombreZona},f${asiento.fila}c${asiento.columna}-${asiento.evento}/${this.evento.labels[asiento.fila]}-${asiento.label}`)
-        asiento.clienteEstado = "pago"
-        asiento.estado = "ocupado"
-        await this.firebase.actualizarAsiento(asiento)
-      })
-      await this.firebase.registrarFactura(transaccion, this.user, this.id!, asientosIds, this.evento)
-      Swal.fire({
-        position: 'top-end',
-        icon: 'success',
-        title: 'Has comprado los asientos!! Muy pronto podrás visualizar el QR para ingresar al evento',
-        showConfirmButton: false,
-        timer: 3000
-      })
-      this.router.navigate(['mis-compras'])
-    } else {
-      Swal.fire({
-        position: 'top-end',
-        icon: 'error',
-        title: 'La transacción no ha sido confirmada, comunícate con tu banco.',
-        showConfirmButton: false,
-        timer: 2000
-      }).then(() => {
-        window.location.reload()
-      })
-    }
-
-
+     let asientos: string = '';
+     let suma = 0
+     this.listaAsientos.forEach((asiento: any) => {
+       let zona = this.evento.zonas.filter((zona: any) => {
+         return zona.nombreZona === asiento.nombreZona
+       })
+       zona = zona[0]
+       suma += zona.precioZona-(zona.precioZona*0.1)
+       asientos += `${asiento.nombreZona} ${this.evento.labels[asiento.fila]}-${asiento.label}, `
+     })
+     asientos = asientos.slice(0, -2)
+     let response = await this.wompi.generarLink(suma, asientos, this.user, this.evento.nombre);
+     response.subscribe(async (res: any) => {
+      let doc=await this.firebase.registrarFactura(res.data.id,this.user, this.id!, asientosIds, this.evento)
+      console.log(doc)
+       window.location.href = `https://checkout.wompi.co/l/${res.data.id}`
+     })
 
   }
+  // vigilarPago(ref: string) {
+  //   this.suscriptionTransaccion = this.firebase.transactions().subscribe(async res => {
+  //     let iterable = Object.entries(res);
+  //     let array: any[] = [];
+
+  //     iterable.forEach(([key, transaccion]: any) => {
+  //       transaccion.key = key;
+  //       array.push(transaccion);
+  //     });
+
+
+
+  //     let respuesta = array.filter(pago => {
+  //       return pago.data.transaction.payment_link_id === ref
+  //     })
+  //     if (respuesta.length > 0) {
+
+  //       await this.aprobarSillas(respuesta[0])
+  //       this.modalService.hide()
+  //       return
+
+  //     }
+  //   })
+  // }
+  // async aprobarSillas(transaccion: any) {
+  //   this.permitirCerrar=false
+  //   this.suscriptionTransaccion.unsubscribe()
+  //   Swal.fire({
+  //     position: 'top-end',
+  //     icon: 'success',
+  //     title: 'Validando compra, por favor espere.',
+  //     showConfirmButton: false,
+  //   })
+  //   if (transaccion.data.transaction.status !== 'APPROVED') {
+  //     let asientosIds: string[] = []
+  //     await this.listaAsientos.forEach(async asiento => {
+  //       asientosIds.push(`${asiento.nombreZona},f${asiento.fila}c${asiento.columna}-${asiento.evento}/${this.evento.labels[asiento.fila]}-${asiento.label}`)
+  //       asiento.clienteEstado = "pago"
+  //       asiento.estado = "ocupado"
+  //       await this.firebase.actualizarAsiento(asiento)
+  //     })
+  //     await this.firebase.registrarFactura(transaccion, this.user, this.id!, asientosIds, this.evento)
+  //     Swal.fire({
+  //       position: 'top-end',
+  //       icon: 'success',
+  //       title: 'Has comprado los asientos!! Muy pronto podrás visualizar el QR para ingresar al evento',
+  //       showConfirmButton: false,
+  //       timer: 3000
+  //     })
+  //     this.router.navigate(['mis-compras'])
+  //   } else {
+  //     Swal.fire({
+  //       position: 'top-end',
+  //       icon: 'error',
+  //       title: 'La transacción no ha sido confirmada, comunícate con tu banco.',
+  //       showConfirmButton: false,
+  //       timer: 2000
+  //     }).then(() => {
+  //       window.location.reload()
+  //     })
+  //   }
+
+
+
+  // }
   string(i: number, j: number) {
     return `${i}-${j}`
   }
@@ -217,6 +221,6 @@ export class EventoComponent implements OnInit, OnDestroy, AfterViewInit {
   doSomething($event: Event) {
     if (this.id) this.firebase.valirdarAsientos(this.id, this.user)
   }
- 
+
 
 }

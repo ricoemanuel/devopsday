@@ -37,7 +37,7 @@ import { EventoComponent } from './components/evento/evento.component';
 import { GridAsientoComponent } from './components/grid-asiento/grid-asiento.component';
 import { AsientoPalcoComponent } from './components/asiento-palco/asiento-palco.component';
 import { LoginComponent } from './components/login/login.component';
-
+import { MatTableExporterModule } from 'mat-table-exporter';
 import { HttpClientModule } from '@angular/common/http';
 import { MisComprasComponent } from './components/mis-compras/mis-compras.component';
 import { AdminComponent } from './components/admin/admin.component';
@@ -63,6 +63,7 @@ import { AdminComponent } from './components/admin/admin.component';
     MatToolbarModule,
     MatStepperModule,
     MatInputModule,
+    MatTableExporterModule,
     MatPaginatorModule,
     MatTableModule,
     MatSelectModule,

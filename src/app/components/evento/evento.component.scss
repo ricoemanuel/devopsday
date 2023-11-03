@@ -162,3 +162,14 @@ table {
     text-align: center;
     color: white;
 }
+.mensaje_404 {
+    text-align: center;
+    font-size: 24px; /* Tamaño de fuente grande */
+    padding: 20px; /* Espaciado interno */
+    border: 2px solid #ccc; /* Borde opcional */
+    border-radius: 10px; /* Borde redondeado opcional */
+    max-width: 400px; /* Ancho máximo del div */
+    margin: 0 auto; /* Centrar horizontalmente */
+    margin-bottom: 10px; /* Espaciado superior para centrar verticalmente */
+    background-color: #f0f0f0; /* Color de fondo opcional */
+}

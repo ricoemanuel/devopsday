@@ -13,7 +13,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 export class AdminComponent implements OnInit, AfterViewInit {
   dataSource: MatTableDataSource<any>
   baseSeleccionada = ""
-  displayedColumns: string[] = ['QR', 'Evento', 'Valor', 'Nombre','personas', 'transaccion', 'fecha'];
+  displayedColumns: string[] = ['QR', 'Evento', 'Valor', 'Nombre','personas', 'transaccion', 'fecha', 'celular', 'correo'];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   spinner!: boolean;
   constructor(private firebase: FirebaseService,
@@ -69,8 +69,18 @@ export class AdminComponent implements OnInit, AfterViewInit {
       if (user!.uid === "NNcOSeH29sRCTw7LDqOlthXdg8E3") {
         this.firebase.getFacturas().subscribe(res => {
           let data = res.filter((factura: any) => {
-            if (factura.eventoData) {
-              return factura.eventoData.nombre.split(" ")[0] === "Innovación" && factura.transaccion.data.transaction.status === 'APPROVED'
+            
+            if (factura.eventoData && factura.evento==="0pRlSIWu9Cxyv7X8s8TQ") {
+              if(factura.transaccion){
+                if(factura.transaccion.transaction){
+                  return factura.eventoData.nombre.split(" ")[0] === "Innovación" && factura.transaccion.transaction.status === 'APPROVED'
+                }
+                if(factura.transaccion.data){
+                  return factura.eventoData.nombre.split(" ")[0] === "Innovación" && factura.transaccion.data.transaction.status === 'APPROVED'
+                }
+              }
+              
+              
             }
             return false
           })

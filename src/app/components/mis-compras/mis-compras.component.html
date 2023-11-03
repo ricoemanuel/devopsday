@@ -2,24 +2,28 @@
     <div class="row justify-content-center">
         <div *ngFor="let entrada of data" class="col-md-4">
             <div class="border">
-                <mat-icon style="cursor: pointer;" (click)="generarPDF(entrada.id)">print</mat-icon>
+                <div class="row">
+                    <div class="col" *ngIf="entrada.estado==='pagando'"><mat-icon style="cursor: pointer;" (click)="verificar(entrada.link)">cached</mat-icon></div>
+                    <div class="col"><mat-icon style="cursor: pointer;" (click)="generarPDF(entrada.id)">print</mat-icon></div>
+                </div>
                 <div #content [id]="entrada.id" class="entrada">
                     <p [routerLink]="'/evento/'+entrada.evento" style="cursor: pointer; font-weight: bold;">
                         {{entrada.eventoData?entrada.eventoData.nombre:'Ir al evento'}}</p>
-                    <div class="codigo">
+                    <div class="codigo" *ngIf="entrada.transaccion">
                         <img [src]="generateQRCodeBase64(entrada.id)" alt="">
                     </div>
-                    <mat-icon> monetization_on</mat-icon>
+                    
+                    <mat-icon *ngIf="entrada.transaccion"> monetization_on</mat-icon>
                     <br>
                     {{
-                    ((entrada.transaccion.data.transaction.amount_in_cents)/100).toLocaleString('en-US', {
-                    style: 'currency', currency: 'USD' })}}
-                    <br><br>
-                    <mat-icon>person</mat-icon>
+                        entrada.transaccion?((entrada.transaccion.transaction?entrada.transaccion.transaction.amount_in_cents:entrada.transaccion.data.transaction.amount_in_cents)/100).toLocaleString('en-US', {
+                    style: 'currency', currency: 'USD' }):''}}
+                    <br><div class="confirmacion" *ngIf="!entrada.transaccion">Pago por confirmar</div><br>
+                    <mat-icon *ngIf="entrada.transaccion">person</mat-icon>
                     <br>
-                    {{entrada.transaccion.data.transaction.customer_data.full_name}}
+                    {{entrada.transaccion?entrada.transaccion.transaction?entrada.transaccion.transaction.customer_data.full_name:entrada.transaccion.data.transaction.customer_data.full_name:''}}
                     <br><br>
-                    <mat-icon>people</mat-icon>
+                    <mat-icon >people</mat-icon>
                     <div class="row justify-content-center" [innerHTML]="formatAsientos(entrada.asientos)"></div>
                     <mat-icon> place</mat-icon>
                     <div class="row justify-content-center" [innerHTML]="formatZonas(entrada.asientos)"></div>

@@ -19,6 +19,22 @@ export class FirebaseService {
     let password = objeto.password
     return signInWithEmailAndPassword(this.auth, email, password)
   }
+  actualizarFactura(obj: any,id:string) {
+    const entradaRef = doc(this.firestore, "facturas", id)
+    return setDoc(entradaRef, obj)
+  }
+  async getFactura(id: string) {
+    const entradaRef = collection(this.firestore, 'facturas');
+    const q = query(entradaRef, where('link', '==', id));
+  
+    try {
+      const querySnapshot = await getDocs(q);
+      return querySnapshot;
+    } catch (error) {
+      console.error('Error al obtener los asientos:', error);
+      throw error;
+    }
+  }
   getDatosWompi(): Observable<any> {
     return interval(100).pipe(
       switchMap(() => this.http.get<any>(this.apiUrl)),
@@ -161,6 +177,10 @@ export class FirebaseService {
     const entradaRef = doc(this.firestore, "asientos", `f${asiento.fila}c${asiento.columna}-${asiento.evento}`)
     return getDoc(entradaRef)
   }
+  getAsientoByDoc(asiento: string) {
+    const entradaRef = doc(this.firestore, "asientos", asiento)
+    return getDoc(entradaRef)
+  }
   async getUser(uid: string) {
     const usuarioRef = doc(this.firestore, "usuarios", uid);
     const usuarioSnapshot = await getDoc(usuarioRef);
@@ -216,17 +236,19 @@ export class FirebaseService {
     return transactions$
   }
 
-  async registrarFactura(transaccion: any, uid: string, evento: string, asientos: string[], eventoData:any) {
+  async registrarFactura(link:string,uid: string, evento: string, asientos: string[], eventoData:any) {
     let obj: any = {
-      transaccion,
+      estado:'pagando',
+      link,
       uid,
       evento,
       asientos,
+      fecha:new Date(),
       eventoData
     }
     const facturaRef = collection(this.firestore, "facturas")
     let doc: DocumentReference = await addDoc(facturaRef, obj)
-    let user: any = await this.getUser(uid)
+    return doc
       // fetch(environment.EmailSender.link, {
       //   method: 'POST',
       //   headers: {
@@ -274,6 +296,10 @@ export class FirebaseService {
         unsubscribe();
       };
     });
+  }
+  async setUserDescuento(obj: any) {
+    const usuarioRef = doc(this.firestore, "usuariosRigoDesc", obj.Documento.toString())
+    return setDoc(usuarioRef, obj)
   }
   getFacturas(): Observable<DocumentData[]> {
     const facturasRef = collection(this.firestore, 'facturas');
