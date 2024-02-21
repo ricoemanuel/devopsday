@@ -1,6 +1,6 @@
 <p *ngIf="!cargando && !login" class="navbar">
     <mat-toolbar color="primary">
-        <span>Eventos Unicafam-MyTicket</span>
+        <span>Eventos MyTicket</span>
         <span class="example-spacer"></span>
         <mat-icon [matMenuTriggerFor]="menu" style="cursor: pointer;" class="logout">person_pin</mat-icon>
         <mat-menu #menu="matMenu">
@@ -12,7 +12,7 @@
       </mat-toolbar>
 </p>
 <router-outlet *ngIf="!cargando"></router-outlet>
-<footer  *ngIf="!cargando">© 2018 - 2023 Todos los derechos reservados / My Ticket Colombia SAS</footer>
+<footer  *ngIf="!cargando">© 2018 - 2024 Todos los derechos reservados / My Ticket Colombia SAS</footer>
 <div class="mensaje">¿Necesitas ayuda?</div>
 <div (click)="redirectW()" class="whatsapp"><img src="../assets/wp.png" alt=""></div>
 <div *ngIf="cargando" class="spinner"><img src="../assets/spinner.gif" alt=""></div>

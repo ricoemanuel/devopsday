@@ -36,25 +36,18 @@ export class MisComprasComponent implements OnInit {
             this.verificar(datos.data.reference.split("_")[0])
           }
         })
+        
       }
+      
 
     })
     this.firebase.getAuthState().subscribe(user => {
       this.firebase.getCurrentFacturas(user!.uid).subscribe(res => {
-        res = res.filter((factura: any) => {
-          if (factura.eventoData) {
-            if(factura.estado){
-              return factura.eventoData.nombre.split(" ")[0] === "Innovación" && factura.asientos.length > 0 && factura.estado!=='cancelado'
-            }else{
-              return factura.eventoData.nombre.split(" ")[0] === "Innovación" && factura.asientos.length > 0
-            }
-            
-          } else {
-            return false
-          }
-        })
+        console.log(res)
         this.data = res
-        //console.log(this.data)
+        this.data.forEach((factura:any)=>{
+          this.verificar(factura.link)
+        })
       })
     })
   }
@@ -72,7 +65,7 @@ export class MisComprasComponent implements OnInit {
         const pdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
         const imgData = canvas.toDataURL('image/png');
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save(`innovacion-${id}`);
+        pdf.save(`devopsday-${id}`);
       });
     } else {
       console.error('No se encontró el elemento con el ID especificado.');
@@ -97,34 +90,11 @@ export class MisComprasComponent implements OnInit {
 
 
   }
-  formatAsientos(asientos: any[]) {
-    let asientosString: string = ""
-    asientos.forEach(asiento => {
-      asientosString += (asiento.split("/")[1] + ', ')
-    })
-    return asientosString.slice(0, -2)
-  }
-  formatZonas(asientos: any[]) {
-    let asientosString: string[] = []
-    asientos.forEach(asiento => {
-      asientosString.push(asiento.split(",")[0])
-    })
-    asientosString = asientosString.filter((item, index) => {
-      return asientosString.indexOf(item) === index;
-    })
-    return asientosString
-  }
-  iterObject(elemento: any) {
-    let claves = Object.keys(elemento)
-    let asistentes: string = ""
-    claves.forEach(clave => {
-      asistentes += `<div class="col-md-4">${clave}<br>Niños: ${elemento[clave].ninos}<br>Adultos: ${elemento[clave].adultos}</div>`
-    })
-    return asistentes
-  }
+ 
+  
   async verificar(link: string) {
     let resfactura = await this.firebase.getFactura(link)
-
+    console.log(resfactura)
     let factura: any
     let id: any
     resfactura.forEach((reserva: any) => {
@@ -132,11 +102,7 @@ export class MisComprasComponent implements OnInit {
       factura = reserva.data()
 
     })
-    let asientos: string[] = []
-    factura.asientos.map(async (asiento: any) => {
-      asientos.push(asiento.split(",")[1].split("/")[0])
-    })
-    //console.log(asientos)
+   
     Swal.fire({
       position: 'top-end',
       icon: 'info',
@@ -164,15 +130,6 @@ export class MisComprasComponent implements OnInit {
         let datos: any = respuesta[0].data
         if (datos.transaction.status === 'APPROVED') {
           factura.transaccion = datos
-          asientos.forEach(async (doc: string) => {
-            let docres = await this.firebase.getAsientoByDoc(doc)
-            let asiento: any = docres.data()
-            asiento.estado = "ocupado"
-            asiento.clienteEstado = "pago"
-            //console.log(asiento)
-            await this.firebase.actualizarAsiento(asiento)
-          })
-
           factura.estado = "comprado"
           await this.firebase.actualizarFactura(factura, id)
           Swal.fire({
@@ -182,17 +139,9 @@ export class MisComprasComponent implements OnInit {
             showConfirmButton: false,
             timer: 3000
           })
-        } else {
+        } else if(datos.transaction.status === 'DECLINED'){
           factura.transaccion = datos
           factura.estado = "cancelado"
-          asientos.forEach(async (doc: string) => {
-            let docres = await this.firebase.getAsientoByDoc(doc)
-            let asiento: any = docres.data()
-            asiento.estado = "libre"
-            asiento.clienteEstado = "null"
-            asiento.clienteUser = "null"
-            await this.firebase.actualizarAsiento(asiento)
-          })
           await this.firebase.actualizarFactura(factura, id)
           Swal.fire({
             position: 'top-end',
@@ -202,18 +151,19 @@ export class MisComprasComponent implements OnInit {
             timer: 2000
           })
         }
+        else {
+          
+          Swal.fire({
+            position: 'top-end',
+            icon: 'error',
+            title: 'La transacción aún no ha sido confirmada',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        }
 
       } else {
-        factura.estado = "cancelado"
-        await this.firebase.actualizarFactura(factura, id)
-        asientos.forEach(async (doc: string) => {
-          let docres = await this.firebase.getAsientoByDoc(doc)
-          let asiento: any = docres.data()
-          asiento.estado = "libre"
-          asiento.clienteEstado = "null"
-          asiento.clienteUser = "null"
-          await this.firebase.actualizarAsiento(asiento)
-        })
+        
         Swal.fire({
           position: 'top-end',
           icon: 'error',

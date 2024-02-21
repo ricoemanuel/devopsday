@@ -173,3 +173,16 @@ table {
     margin-bottom: 10px; /* Espaciado superior para centrar verticalmente */
     background-color: #f0f0f0; /* Color de fondo opcional */
 }
+.get{
+    background-color: #0b133b;
+    color: white;
+    padding: 7px;
+    border-radius: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

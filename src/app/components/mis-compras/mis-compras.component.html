@@ -24,9 +24,11 @@
                     {{entrada.transaccion?entrada.transaccion.transaction?entrada.transaccion.transaction.customer_data.full_name:entrada.transaccion.data.transaction.customer_data.full_name:''}}
                     <br><br>
                     <mat-icon >people</mat-icon>
-                    <div class="row justify-content-center" [innerHTML]="formatAsientos(entrada.asientos)"></div>
+                    <div class="row justify-content-center" >{{entrada.people}} personas</div>
                     <mat-icon> place</mat-icon>
-                    <div class="row justify-content-center" [innerHTML]="formatZonas(entrada.asientos)"></div>
+                    <div class="row justify-content-center" >teatro de la Universidad CES, Medellín-Colombia</div>
+                    <mat-icon> date_range</mat-icon>
+                    <div class="row justify-content-center" >{{entrada.fechas[0]&&entrada.fechas[1]?'23 y 24 de mayo':entrada.fechas[0]?'23 de mayo':entrada.fechas[1]?'24 de mayo':null}}</div>
                 </div>
             </div>
         </div>

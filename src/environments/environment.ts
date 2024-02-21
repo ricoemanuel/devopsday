@@ -1,20 +1,20 @@
 export const environment = {
   firebase: {
-      projectId: 'myticketeventos',
-      appId: '1:290015062564:web:d1770a05acca36952cc6b1',
-      storageBucket: 'myticketeventos.appspot.com',
-      apiKey: 'AIzaSyDrmlLtmYc-pDGovvGvlJABEv4aDWgK_x8',
-      authDomain: 'myticketeventos.firebaseapp.com',
-      messagingSenderId: '290015062564',
-      measurementId: 'G-932QCRPQWS',
-      databaseURL: 'https://myticketeventos-default-rtdb.firebaseio.com',
+    apiKey: "AIzaSyCNT7rUcsiJBPeEKIC7ng-TLsKwu4-bFUw",
+    authDomain: "pagos-devopsday.firebaseapp.com",
+    projectId: "pagos-devopsday",
+    storageBucket: "pagos-devopsday.appspot.com",
+    messagingSenderId: "905862832100",
+    appId: "1:905862832100:web:af981b28829a00b333b1f1",
+    measurementId: "G-R7ZTFGNT0H",
+    databaseURL: 'https://pagos-devopsday-default-rtdb.firebaseio.com',
   },
-  wompi:{
-    head:'prv_prod_hYyfJ56bMTY3p34c5tTf4s7UPQTWXMfZ',
-    link:"https://production.wompi.co/v1/"
+  wompi: {
+    head: 'prv_prod_MV41LuImTOanVtntkJYnGFRneoLoAF6z',
+    link: "https://production.wompi.co/v1/"
   },
-  EmailSender:{
-    head:'Bearer re_TVEGrqzN_NL7aWPA8NrZi452sQgsVQi8T',
-    link:'https://api.resend.com/emails'
+  EmailSender: {
+    head: 'Bearer re_TVEGrqzN_NL7aWPA8NrZi452sQgsVQi8T',
+    link: 'https://api.resend.com/emails'
   }
 };

@@ -1,82 +1,93 @@
-<div class="spinner" *ngIf="spinner"><img src="../assets/spinner.gif" alt=""></div>
-<div *ngIf="!spinner">
+<div>
     <!-- <div class="mensaje_404">
         Este evento se ha cancelado.
     </div> -->
-     <div *ngIf="id && evento" class="row margin">
+    <div class="row margin">
         <div class="col-md-3">
-            <div class="img"><img width="250" src="../../../assets/rigo.jpg" alt=""></div>
+            <div class="img"><img width="250" src="../../../assets/logo.png" alt=""></div>
 
         </div>
-         <div class="col-md-9 pt-3 margin-c">
+        <div *ngIf="!formTab" class="col-md-9 pt-3 margin-c">
             <div class="card mx-auto">
                 <div class="card-body">
-                    <h5 class="card-title">{{evento.nombre}}</h5>
-                    <p class="card-text">{{evento.descripcion}}</p>
+                    <h5 class="card-title">Devops day</h5>
+                    <p class="card-text">DevOpsDays es un evento internacional de conferencias técnicas sobre temas de
+                        desarrollo de software, operaciones de TI y la intersección entre ellas.
+
+
+
+                        Los eventos de DevOpsDays presentan una combinación de talleres y charlas, además de contar con
+                        sesiones abiertas y autoorganizadas y espacios para Networking con referentes de la comunidad
+                        DevOps, quienes compartirán sus experiencias obtenidas en diferentes organizaciones, países y
+                        culturas, presentando casos reales, lecciones aprendidas, éxitos y obstáculos que enfrentan a
+                        diario.</p>
                     <div class="row">
                         <div class="col">
-                            <p><strong>Ubicacion: </strong>Teatro Cafam, Bogotá</p>
+                            <p><strong>Ubicacion: </strong>teatro de la Universidad CES, Medellín-Colombia</p>
                         </div>
                         <div class="col">
-                            <p><strong>Fecha: </strong>Noviembre 7 de 2023</p>
+                            <p><strong>Fecha: </strong>23 y 24 de mayo</p>
                         </div>
                         <div class="col">
-                            <p><strong>Hora: </strong>10:00 a.m. a 11:10 a.m.</p>
+                            <p><strong>Hora: </strong>1?</p>
                         </div>
                     </div>
+                    <table mat-table [dataSource]="returnKeys()">
+                        <ng-container matColumnDef="type">
+                          <th mat-header-cell *matHeaderCellDef>Tipo</th>
+                          <td mat-cell *matCellDef="let price">{{ price }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="person">
+                          <th mat-header-cell *matHeaderCellDef>Persona por día</th>
+                          <td mat-cell *matCellDef="let price">{{ precios[price].persona | currency }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="combo">
+                          <th mat-header-cell *matHeaderCellDef>5 personas o más por dos días cada una</th>
+                          <td mat-cell *matCellDef="let price">{{ precios[price].combo | currency }}</td>
+                        </ng-container>
+                       
+                      
+                        <tr mat-header-row *matHeaderRowDef="['type', 'person', 'combo']"></tr>
+                        <tr mat-row *matRowDef="let row; columns: ['type', 'person', 'combo'];"></tr>
+                      </table>
+                      <br>
                     <h6 class="card-subtitle mb-2 text-muted">Compra tu entrada:</h6>
-                    <h6 class="card-subtitle mb-2 text-muted">Por favor selecciona alguna de las localidades para
-                        seleccionar su asiento.</h6>
-                    <div class="row tabla">
-                        <table>
-                            <ng-container *ngFor="let fila of matriz; let i = index">
-                                <tr>
-                                    <ng-container *ngFor="let elemento of fila; let j = index">
 
-                                        <td class="caja" (click)="mostrarZona(elemento.nombreZona, template)"
-                                            [style.backgroundColor]="elemento ? '#3f51b5' : 'transparent'"
-                                            [style.cursor]="elemento?'pointer':''">
-                                            <div class="llenado">
-                                                <label [style.cursor]="elemento?'pointer':''" [id]="string(i,j)"
-                                                    class="nombre"></label>
-
-                                                <ng-container>
-                                                    {{mostrarNombre(elemento.nombreZona,string(i,j),elemento.precioZona)}}
-                                                </ng-container>
-
-
-                                            </div>
-                                        </td>
-                                    </ng-container>
-                                </tr>
-                            </ng-container>
-                            
-                        </table>
-                        <div class="tarima">Tarima</div>
-                    </div>
                     <br>
-                    
+                    <div class="center">
+                        <button (click)="comprar()" class="get">¡Adquiere tu Ticket ahora!</button>
+                    </div>
+
                 </div>
 
             </div>
 
-        </div> 
-        
+        </div>
+        <div *ngIf="formTab" class="col-md-9 pt-3 margin-c">
+            <div class="card mx-auto">
+                <div class="card-body">
+                    <br>
+                    <div class="center">
+                        <form [formGroup]="personForm">
+                            <mat-form-field>
+                                <input matInput type="number" formControlName="numberOfPeople"
+                                    placeholder="Número de personas">
+                            </mat-form-field>
+                            <br>
+                            <mat-checkbox formControlName="may23">23 de mayo</mat-checkbox>
+                            <br>
+                            <mat-checkbox formControlName="may24">24 de mayo</mat-checkbox>
+                            <br>
+                            <div class="center">
+                                <button [disabled]="disabled" (click)="pagar()" class="get">Pagar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
     </div>
 
-    <ng-template #template>
-        <div *ngIf="permitirCerrar" (click)="cerrarPopup({})" class="close"><mat-icon>close</mat-icon></div>
-        <h3 class="title">{{selectedZone}}</h3>
-        <app-grid-asientos (cerrarPopUpA)="cerrarPopup($event)" [labels]="evento.labels" 
-            [zonaSeleccionada]="selectedZone"></app-grid-asientos>
-        <div class="centrar">
-            <button [disabled]="!(listaAsientos.length>0)" class="btn btn-success" (click)="pagar(wompi)">Pagar</button>
-        </div>
-
-    </ng-template>
-
-    <ng-template #wompi>
-        <div *ngIf="permitirCerrar" (click)="cerrarPopup({})" class="close"><mat-icon>close</mat-icon></div>
-        <iframe class="wompi" [src]="link"></iframe>
-    </ng-template>
 </div>

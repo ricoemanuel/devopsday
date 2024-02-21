@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef, Pipe, PipeTransform, OnDestroy, ChangeDetectorRef, AfterViewInit, ElementRef, HostListener } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DomSanitizer, SafeHtml, SafeResourceUrl, SafeScript, SafeStyle, SafeUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
@@ -12,215 +12,86 @@ import Swal from 'sweetalert2';
   templateUrl: './evento.component.html',
   styleUrls: ['./evento.component.scss']
 })
-export class EventoComponent implements OnInit, OnDestroy, AfterViewInit {
-  spinner: boolean = true
-  id: string | null;
-  evento: any
-  modalRef?: BsModalRef;
-  listaAsientos: any[] = []
-  link!: SafeUrl
-  user!: string
-  enabled = new FormControl(false);
-  suscriptionTransaccion!: Subscription;
-  asientosReservadosSus!: Subscription;
-  matriz: any[] = []
-  localidadesMostradas: Set<string> = new Set<string>();
-  nombreLocalidadMostrado: boolean = false;
+export class EventoComponent implements OnInit {
+  personForm: FormGroup;
+  precios: any = {
+    "Early Bird": {
+      "persona": 249000,
+      "combo": 449000,
+      "estado": 'activo'
+    },
+  }
   constructor(private aRoute: ActivatedRoute,
     private firebase: FirebaseService,
     private modalService: BsModalService,
     private wompi: WompiService,
     protected _sanitizer: DomSanitizer,
     private cdRef: ChangeDetectorRef,
-    private el: ElementRef, private router: Router) {
-    this.id = this.aRoute.snapshot.paramMap.get('id');
+    private el: ElementRef, private router: Router,
+    private formBuilder: FormBuilder) {
+    this.personForm = this.formBuilder.group({
+      numberOfPeople: ['', [Validators.required, Validators.min(1)]],
+      may23: [false],
+      may24: [false]
+    });
   }
-  ngAfterViewInit(): void {
-    this.spinner = false
-  }
-  ngOnDestroy(): void {
-    this.valirdarAsientos()
-  }
+
+  current: any
+  user: any
   async ngOnInit(): Promise<void> {
-    //  this.firebase.getAsientoByLibre().then(res=>{
-    //    res.forEach(async (asiento:any)=>{
-    //      asiento.estado='libre'
-    //      asiento.clienteEstado='null'
-    //      asiento.clienteUser='null'
-    //      delete asiento.cliente
-    //      delete asiento.vendedor
-    //      await this.firebase.actualizarAsiento(asiento)
-    //    })
-    //  })
-    if (this.id) {
-      this.evento = await this.firebase.getevento(this.id)
-      for (let i = 0; i < this.evento.filas; i++) {
-        let array: any[] = []
-        for (let j = 0; j < this.evento.columnas; j++) {
-          array.push(false)
-        }
-        this.matriz.push(array)
-      }
-
-
-      this.evento.zonas.forEach((zona: any) => {
-        zona.precioZona = parseInt(zona.precioZona)
-      });
-      this.valirdarAsientos()
-      this.getAsientos()
-    }
-  }
-  valirdarAsientos() {
+    this.current = this.currentPrice()
     this.firebase.getAuthState().subscribe(async res => {
-      if (res && this.id) {
+      if (res) {
         this.user = res.uid
-        this.asientosReservadosSus = this.firebase.getAsientoRealtimeByUsuarioEstado(res.uid, this.id).subscribe(res => {
-          this.listaAsientos = res
-        })
-        await this.firebase.valirdarAsientos(this.id, this.user)
       }
     })
   }
-  getAsientos() {
-    this.evento.zonas.forEach((zona: any) => {
-      zona.arrayZonas.forEach((asiento: any) => {
-        this.matriz[asiento.fila][asiento.columna] = zona
-      })
-    })
-
-
-
-
-  }
-
-  openModal(template: TemplateRef<any>) {
-
-    this.modalRef = this.modalService.show(template);
-
-
-  }
-  selectedZone = ""
-  mostrarZona(zona: any, template: TemplateRef<any>) {
-    if (zona) {
-      this.selectedZone = zona
-      this.openModal(template)
-    }
-
-  }
-  permitirCerrar: boolean = true
-  cerrarPopup(event: any) {
-    this.modalService.hide()
-  }
-  async pagar(template: TemplateRef<any>) {
-    this.permitirCerrar=false
-    let asientosIds: string[] = []
-    this.listaAsientos.map(async (asiento: any) => {
-      asientosIds.push(`${asiento.nombreZona},f${asiento.fila}c${asiento.columna}-${asiento.evento}/${this.evento.labels[asiento.fila]}-${asiento.label}`)
-      asiento.clienteEstado = "pagando"
-      await this.firebase.actualizarAsiento(asiento)
-    })
-     let asientos: string = '';
-     let suma = 0
-     this.listaAsientos.forEach((asiento: any) => {
-       let zona = this.evento.zonas.filter((zona: any) => {
-         return zona.nombreZona === asiento.nombreZona
-       })
-       zona = zona[0]
-       suma += zona.precioZona-(zona.precioZona*0.1)
-       asientos += `${asiento.nombreZona} ${this.evento.labels[asiento.fila]}-${asiento.label}, `
-     })
-     asientos = asientos.slice(0, -2)
-     let response = await this.wompi.generarLink(suma, asientos, this.user, this.evento.nombre);
-     response.subscribe(async (res: any) => {
-      let doc=await this.firebase.registrarFactura(res.data.id,this.user, this.id!, asientosIds, this.evento)
-      console.log(doc)
-       window.location.href = `https://checkout.wompi.co/l/${res.data.id}`
-     })
-
-  }
-  // vigilarPago(ref: string) {
-  //   this.suscriptionTransaccion = this.firebase.transactions().subscribe(async res => {
-  //     let iterable = Object.entries(res);
-  //     let array: any[] = [];
-
-  //     iterable.forEach(([key, transaccion]: any) => {
-  //       transaccion.key = key;
-  //       array.push(transaccion);
-  //     });
-
-
-
-  //     let respuesta = array.filter(pago => {
-  //       return pago.data.transaction.payment_link_id === ref
-  //     })
-  //     if (respuesta.length > 0) {
-
-  //       await this.aprobarSillas(respuesta[0])
-  //       this.modalService.hide()
-  //       return
-
-  //     }
-  //   })
-  // }
-  // async aprobarSillas(transaccion: any) {
-  //   this.permitirCerrar=false
-  //   this.suscriptionTransaccion.unsubscribe()
-  //   Swal.fire({
-  //     position: 'top-end',
-  //     icon: 'success',
-  //     title: 'Validando compra, por favor espere.',
-  //     showConfirmButton: false,
-  //   })
-  //   if (transaccion.data.transaction.status !== 'APPROVED') {
-  //     let asientosIds: string[] = []
-  //     await this.listaAsientos.forEach(async asiento => {
-  //       asientosIds.push(`${asiento.nombreZona},f${asiento.fila}c${asiento.columna}-${asiento.evento}/${this.evento.labels[asiento.fila]}-${asiento.label}`)
-  //       asiento.clienteEstado = "pago"
-  //       asiento.estado = "ocupado"
-  //       await this.firebase.actualizarAsiento(asiento)
-  //     })
-  //     await this.firebase.registrarFactura(transaccion, this.user, this.id!, asientosIds, this.evento)
-  //     Swal.fire({
-  //       position: 'top-end',
-  //       icon: 'success',
-  //       title: 'Has comprado los asientos!! Muy pronto podrás visualizar el QR para ingresar al evento',
-  //       showConfirmButton: false,
-  //       timer: 3000
-  //     })
-  //     this.router.navigate(['mis-compras'])
-  //   } else {
-  //     Swal.fire({
-  //       position: 'top-end',
-  //       icon: 'error',
-  //       title: 'La transacción no ha sido confirmada, comunícate con tu banco.',
-  //       showConfirmButton: false,
-  //       timer: 2000
-  //     }).then(() => {
-  //       window.location.reload()
-  //     })
-  //   }
-
-
-
-  // }
-  string(i: number, j: number) {
-    return `${i}-${j}`
-  }
-  nombresMostrados: string[] = [];
-  ids: string[] = []
-  mostrarNombre(nombre: string, id: string, precio: number) {
-    if (!this.nombresMostrados.includes(nombre)) {
-      this.nombresMostrados.push(nombre);
-      const elemento = document.getElementById(id);
-      if (elemento) {
-        elemento.innerHTML = `${nombre ? nombre : ""}${nombre ? ':' : ""} ${precio ? precio.toLocaleString('es-ES') : ""}`;
+  currentPrice() {
+    let currentPrice: any = {}
+    Object.keys(this.precios).forEach((plan: any) => {
+      if (this.precios[plan].estado === 'activo') {
+        currentPrice = plan
       }
+    })
+    return currentPrice
+  }
+  formTab: boolean = false
+  comprar() {
+    if (this.user) {
+      this.formTab = true
+    } else {
+      this.router.navigate(['login'])
+    }
+
+  }
+  disabled:boolean=false
+  async pagar() {
+    if (this.personForm.valid) {
+      this.disabled=true
+      let numberOfPeople = this.personForm.value.numberOfPeople
+      let may23 = this.personForm.value.may23
+      let may24 = this.personForm.value.may24
+      let price = this.precios[this.current].persona
+      let description = `Pago de ${numberOfPeople} personas ${may23 && may24 ? 'para las fechas 24 y 23 de mayo' : may23 ? 'para la fecha 23 de mayo' : may24 ? 'para la fecha 24 de mayo' : null}`
+      console.log(description)
+      if (numberOfPeople >= 5 && may23 && may24) {
+        price = this.precios[this.current].combo
+      }
+
+      let valor = numberOfPeople * price
+      let response = await this.wompi.generarLink(valor, this.user, "devops day", description);
+      response.subscribe((async (res: any) => {
+        await this.firebase.registrarFactura(res.data.id, this.user, "devops day", numberOfPeople, valor, [may23,may24])
+        window.location.href = `https://checkout.wompi.co/l/${res.data.id}`
+      }))
     }
   }
-  @HostListener('window:beforeunload', ['$event'])
-  doSomething($event: Event) {
-    if (this.id) this.firebase.valirdarAsientos(this.id, this.user)
+  returnKeys() {
+    console.log(this.current)
+    return Object.keys(this.precios)
   }
+
+
 
 
 }

@@ -34,19 +34,17 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { EventoComponent } from './components/evento/evento.component';
-import { GridAsientoComponent } from './components/grid-asiento/grid-asiento.component';
-import { AsientoPalcoComponent } from './components/asiento-palco/asiento-palco.component';
 import { LoginComponent } from './components/login/login.component';
 import { MatTableExporterModule } from 'mat-table-exporter';
 import { HttpClientModule } from '@angular/common/http';
 import { MisComprasComponent } from './components/mis-compras/mis-compras.component';
 import { AdminComponent } from './components/admin/admin.component';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import { MatCardModule } from '@angular/material/card';
 @NgModule({
   declarations: [
     AppComponent,
     EventoComponent,
-    GridAsientoComponent,
-    AsientoPalcoComponent,
     LoginComponent,
     MisComprasComponent,
     AdminComponent,
@@ -68,10 +66,12 @@ import { AdminComponent } from './components/admin/admin.component';
     MatTableModule,
     MatSelectModule,
     MatExpansionModule,
+    MatCheckboxModule,
     MatMenuModule,
     MatAutocompleteModule,
     HttpClientModule,
     MatTooltipModule,
+    MatCardModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),

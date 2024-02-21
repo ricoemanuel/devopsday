@@ -10,10 +10,10 @@ export class WompiService {
     'authorization': `Bearer ${environment.wompi.head}`
   });
   constructor(private http: HttpClient) { }
-  async generarLink(valor:number, asientos:string, usuario:string, title: string) {
+  async generarLink(valor:number, usuario:string, title: string, description:string) {
     const data = {
-      "name": `Pago de ${title} con el 10% de descuento.`,
-      "description": `Asientos del evento: ${asientos}. Código de usuario ${usuario}` ,
+      "name": `Pago de ${title}`,
+      "description": description,
       "single_use": true,
       "currency": "COP",
       "amount_in_cents": valor*100,
