@@ -10,7 +10,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class FirebaseService {
-  private apiUrl = 'https://myticketeventos-default-rtdb.firebaseio.com/transacciones.json';
+  private apiUrl = 'https://pagos-devopsday-default-rtdb.firebaseio.com/transacciones.json';
 
   esAdminS!: boolean
   constructor(private database: Database, private auth: Auth, private firestore: Firestore, private http: HttpClient, private db: Database) { }
@@ -279,7 +279,7 @@ export class FirebaseService {
   }
   getCurrentFacturas(uid: string): Observable<DocumentData[]> {
     const entradaRef = collection(this.firestore, 'facturas');
-    const q = query(entradaRef, where('uid', '==', uid),where('eventoData','==','devops day'));
+    const q = query(entradaRef, where('uid', '==', uid),where('eventoData','==','devops day'), where('estado','!=','cancelado'));
   
     return new Observable<DocumentData[]>(observer => {
       const unsubscribe = onSnapshot(q, snapshot => {

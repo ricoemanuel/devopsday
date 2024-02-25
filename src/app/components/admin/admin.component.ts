@@ -4,6 +4,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import * as QRCode from 'qrcode-generator';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-admin',
@@ -13,7 +14,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 export class AdminComponent implements OnInit, AfterViewInit {
   dataSource: MatTableDataSource<any>
   baseSeleccionada = ""
-  displayedColumns: string[] = ['QR', 'Evento', 'Valor', 'Nombre','personas', 'transaccion', 'fecha', 'celular', 'correo'];
+  displayedColumns: string[] = ['QR', 'Valor', 'Nombre', 'transaccion', 'fecha', 'celular', 'correo', 'acciones'];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   spinner!: boolean;
   constructor(private firebase: FirebaseService,
@@ -47,74 +48,13 @@ export class AdminComponent implements OnInit, AfterViewInit {
 
 
   }
-  cont: number = 0
-  contBalconC: number = 0
-  contBalconL: number = 0
-  contPlateaC: number = 0
-  contPlateaL: number = 0
   async ngOnInit(): Promise<void> {
     this.spinner = true
-    //  let asientos=await this.firebase.getAsientoByEstadoString("ocupado")
-    //  console.log(asientos)
-    //  asientos.forEach(async (asiento:any)=>{
-    //    asiento.estado="libre"
-    //    asiento.clienteUser="null"
-    //    if(asiento.clienteUSer){
-    //      delete asiento.clienteUSer
-    //    }
-    //    asiento.clienteEstado="null"
-    //  })
-    let asientosFactura: string[] = []
     this.firebase.getAuthState().subscribe(user => {
-      if (user!.uid === "NNcOSeH29sRCTw7LDqOlthXdg8E3") {
+      if (user!.uid === "qSt9YQZVukPBeEvtxk28T98JhzG2") {
         this.firebase.getFacturas().subscribe(res => {
-          let data = res.filter((factura: any) => {
-            
-            if (factura.eventoData && factura.evento==="0pRlSIWu9Cxyv7X8s8TQ") {
-              if(factura.transaccion){
-                if(factura.transaccion.transaction){
-                  return factura.eventoData.nombre.split(" ")[0] === "Innovación" && factura.transaccion.transaction.status === 'APPROVED'
-                }
-                if(factura.transaccion.data){
-                  return factura.eventoData.nombre.split(" ")[0] === "Innovación" && factura.transaccion.data.transaction.status === 'APPROVED'
-                }
-              }
-              
-              
-            }
-            return false
-          })
-          this.contPlateaC=0
-          this.contBalconL=0
-          this.contPlateaL=0
-          this.contBalconC=0
-          this.cont=0
-          data.forEach(async (factura: any) => {
-            factura.asientos.forEach((asiento:any)=>{
-              if(asiento.split(",")[0]==="PLATEA CENTRAL"){
-                this.contPlateaC+=1
-              }
-              if(asiento.split(",")[0]==="BALCON LATERAL DERECHO" || asiento.split(",")[0]==="BALCON LATERAL IZQUIERDO"){
-                this.contBalconL+=1
-              }
-              if(asiento.split(",")[0]==="PLATEA LATERAL DERECHA" || asiento.split(",")[0]==="PLATEA LATERAL IZQUIERDA"){
-                this.contPlateaL+=1
-              }
-              if(asiento.split(",")[0]==="BALCON CENTRAL"){
-                this.contBalconC+=1
-              }
-            })
-            this.cont += factura.asientos.length
-          })
-          // let Existe:any[]=[]
-          // asientosFactura.forEach((mesa:string)=>{
-          //   let existe=asientos.filter((mesaA:any)=>{
-          //     return mesaA.id===mesa
-          //   })
-          //   Existe.push(existe[0])
-          // })
-          // let diferencia=asientos.filter(item => !Existe.includes(item));
-          // console.log(diferencia)
+          let data = res.filter((fac:any)=>fac.estado==='cancelado')
+         
           this.dataSource.data = data
           this.dataSource.paginator = this.paginator;
         })
@@ -170,5 +110,86 @@ export class AdminComponent implements OnInit, AfterViewInit {
       asistentes += `<br>${clave}<br>Niños: ${elemento[clave].ninos}<br>Adultos: ${elemento[clave].adultos}<br>`
     })
     return asistentes
+  }
+  async verificar(link: string) {
+    let resfactura = await this.firebase.getFactura(link)
+    let factura: any
+    let id: any
+    resfactura.forEach((reserva: any) => {
+      id = reserva.id
+      factura = reserva.data()
+
+    })
+
+    Swal.fire({
+      position: 'top-end',
+      icon: 'info',
+      title: 'Validando compra, por favor espere, Esto puede demorar un par de minutos',
+      showConfirmButton: false,
+
+    })
+
+    this.firebase.transactions().subscribe(async res => {
+      let iterable = Object.entries(res);
+      let array: any[] = [];
+
+      iterable.forEach(([key, transaccion]: any) => {
+        transaccion.key = key;
+        array.push(transaccion);
+      });
+
+
+
+      let respuesta = array.filter(pago => {
+        return pago.data.transaction.payment_link_id === link
+      })
+
+      if (respuesta.length > 0) {
+        let datos: any = respuesta[0].data
+        if (datos.transaction.status === 'APPROVED') {
+          factura.transaccion = datos
+          factura.estado = "comprado"
+          await this.firebase.actualizarFactura(factura, id)
+          Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: 'Has comprado tú entrada!',
+            showConfirmButton: false,
+            timer: 3000
+          })
+        } else if (datos.transaction.status === 'DECLINED') {
+          factura.transaccion = datos
+          factura.estado = "cancelado"
+          await this.firebase.actualizarFactura(factura, id)
+          Swal.fire({
+            position: 'top-end',
+            icon: 'error',
+            title: 'La transacción ha sido rechazada, comunícate con tu banco.',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        }
+        else {
+
+          Swal.fire({
+            position: 'top-end',
+            icon: 'error',
+            title: 'La transacción aún no ha sido confirmada',
+            showConfirmButton: false,
+            timer: 2000
+          })
+        }
+
+      } else {
+
+        Swal.fire({
+          position: 'top-end',
+          icon: 'error',
+          title: 'La transacción no ha sido confirmada, comunícate con tu banco.',
+          showConfirmButton: false,
+          timer: 2000
+        })
+      }
+    })
   }
 }

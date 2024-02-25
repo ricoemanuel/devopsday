@@ -28,25 +28,26 @@ export class MisComprasComponent implements OnInit {
     this.route.queryParams.subscribe(async params => {
       this.idTranssaccion = params['id']
       if (this.idTranssaccion) {
-       
+
         let res = await this.wompi.transacciones(this.idTranssaccion)
         res.subscribe(async (datos: any) => {
-          if(datos){
-            //console.log(datos)
+          if (datos) {
             this.verificar(datos.data.reference.split("_")[0])
           }
         })
-        
+
       }
-      
+
 
     })
     this.firebase.getAuthState().subscribe(user => {
       this.firebase.getCurrentFacturas(user!.uid).subscribe(res => {
-        console.log(res)
         this.data = res
-        this.data.forEach((factura:any)=>{
-          this.verificar(factura.link)
+        this.data.forEach(async (factura: any) => {
+          if (factura.estado === 'pagando') {
+            await this.verificar(factura.link)
+          }
+
         })
       })
     })
@@ -90,11 +91,10 @@ export class MisComprasComponent implements OnInit {
 
 
   }
- 
-  
+
+
   async verificar(link: string) {
     let resfactura = await this.firebase.getFactura(link)
-    console.log(resfactura)
     let factura: any
     let id: any
     resfactura.forEach((reserva: any) => {
@@ -102,7 +102,7 @@ export class MisComprasComponent implements OnInit {
       factura = reserva.data()
 
     })
-   
+
     Swal.fire({
       position: 'top-end',
       icon: 'info',
@@ -139,7 +139,7 @@ export class MisComprasComponent implements OnInit {
             showConfirmButton: false,
             timer: 3000
           })
-        } else if(datos.transaction.status === 'DECLINED'){
+        } else if (datos.transaction.status === 'DECLINED') {
           factura.transaccion = datos
           factura.estado = "cancelado"
           await this.firebase.actualizarFactura(factura, id)
@@ -152,7 +152,7 @@ export class MisComprasComponent implements OnInit {
           })
         }
         else {
-          
+
           Swal.fire({
             position: 'top-end',
             icon: 'error',
@@ -163,7 +163,7 @@ export class MisComprasComponent implements OnInit {
         }
 
       } else {
-        
+
         Swal.fire({
           position: 'top-end',
           icon: 'error',

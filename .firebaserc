@@ -1,14 +1,14 @@
 {
   "targets": {
-    "myticketeventos": {
+    "pagos-devopsday": {
       "hosting": {
-        "myticketeventos": [
-          "myticketeventos"
+        "pagos-devopsday": [
+          "pagos-devopsday"
         ]
       }
     }
   },
   "projects": {
-    "default": "myticketeventos"
+    "default": "pagos-devopsday"
   }
 }

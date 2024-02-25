@@ -17,7 +17,7 @@ export class EventoComponent implements OnInit {
   precios: any = {
     "Early Bird": {
       "persona": 249000,
-      "combo": 449000,
+      "combo": 449000 / 2,
       "estado": 'activo'
     },
   }
@@ -64,26 +64,31 @@ export class EventoComponent implements OnInit {
     }
 
   }
-  disabled:boolean=false
+  disabled: boolean = false
   async pagar() {
-    if (this.personForm.valid) {
-      this.disabled=true
+    if (this.personForm.valid && (this.personForm.value.may23 || this.personForm.value.may24)) {
+      this.disabled = true
       let numberOfPeople = this.personForm.value.numberOfPeople
       let may23 = this.personForm.value.may23
       let may24 = this.personForm.value.may24
       let price = this.precios[this.current].persona
-      let description = `Pago de ${numberOfPeople} personas ${may23 && may24 ? 'para las fechas 24 y 23 de mayo' : may23 ? 'para la fecha 23 de mayo' : may24 ? 'para la fecha 24 de mayo' : null}`
-      console.log(description)
+      let description = `Pago de ${numberOfPeople} personas ${may23 && may24 ? 'Válido para 2 días, 23 y 24 de mayo' : may23 ? 'Válido para 1 día, 23 de mayo' : may24 ? 'Válido para 1 día, 24 de mayo' : null}`
       if (numberOfPeople >= 5 && may23 && may24) {
         price = this.precios[this.current].combo
       }
-
-      let valor = numberOfPeople * price
-      let response = await this.wompi.generarLink(valor, this.user, "devops day", description);
+      let valor = numberOfPeople * price * (may23 && may24 ? 2 : 1)
+      let response = await this.wompi.generarLink(valor, this.user, description);
       response.subscribe((async (res: any) => {
-        await this.firebase.registrarFactura(res.data.id, this.user, "devops day", numberOfPeople, valor, [may23,may24])
+        await this.firebase.registrarFactura(res.data.id, this.user, "devops day", numberOfPeople, valor, [may23, may24])
         window.location.href = `https://checkout.wompi.co/l/${res.data.id}`
       }))
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Debes diligenciar todos los campos',
+
+      })
     }
   }
   returnKeys() {

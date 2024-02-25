@@ -10,16 +10,16 @@ export class WompiService {
     'authorization': `Bearer ${environment.wompi.head}`
   });
   constructor(private http: HttpClient) { }
-  async generarLink(valor:number, usuario:string, title: string, description:string) {
+  async generarLink(valor:number, usuario:string, description:string) {
     const data = {
-      "name": `Pago de ${title}`,
-      "description": description,
+      "name": `Pago DevOpsDays Medellín 2024`,
+      "description": `${description} usuario: ${usuario}`,
       "single_use": true,
       "currency": "COP",
       "amount_in_cents": valor*100,
       "collect_shipping": false,
       "collect_customer_legal_id": true,
-      "redirect_url":"https://myticketeventos.web.app/mis-compras"
+      "redirect_url":"http://localhost:4200/mis-compras"
     };
     return this.http.post(`${environment.wompi.link}payment_links`, data, { headers: this.headers })
     
