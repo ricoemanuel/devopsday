@@ -34,23 +34,23 @@
                     </div>
                     <table mat-table [dataSource]="returnKeys()">
                         <ng-container matColumnDef="type">
-                          <th mat-header-cell *matHeaderCellDef>Tipo</th>
-                          <td mat-cell *matCellDef="let price">{{ price }}</td>
+                            <th mat-header-cell *matHeaderCellDef>Tipo</th>
+                            <td mat-cell *matCellDef="let price">{{ price }}</td>
                         </ng-container>
                         <ng-container matColumnDef="person">
-                          <th mat-header-cell *matHeaderCellDef>Persona por día</th>
-                          <td mat-cell *matCellDef="let price">{{ precios[price].persona | currency }}</td>
+                            <th mat-header-cell *matHeaderCellDef>Persona por día</th>
+                            <td mat-cell *matCellDef="let price">{{ precios[price].persona | currency }}</td>
                         </ng-container>
                         <ng-container matColumnDef="combo">
-                          <th mat-header-cell *matHeaderCellDef>5 personas o más por dos días cada una</th>
-                          <td mat-cell *matCellDef="let price">{{ precios[price].combo*2 | currency }}</td>
+                            <th mat-header-cell *matHeaderCellDef>5 personas o más por dos días cada una</th>
+                            <td mat-cell *matCellDef="let price">{{ precios[price].combo*2 | currency }}</td>
                         </ng-container>
-                       
-                      
+
+
                         <tr mat-header-row *matHeaderRowDef="['type', 'person', 'combo']"></tr>
                         <tr mat-row *matRowDef="let row; columns: ['type', 'person', 'combo'];"></tr>
-                      </table>
-                      <br>
+                    </table>
+                    <br>
                     <h6 class="card-subtitle mb-2 text-muted">Compra tu entrada:</h6>
 
                     <br>
@@ -64,25 +64,51 @@
 
         </div>
         <div *ngIf="formTab" class="col-md-9 pt-3 margin-c">
+
             <div class="card mx-auto">
                 <div class="card-body">
                     <br>
+                    <mat-icon style="cursor: pointer;" (click)="comprar()">arrow_back</mat-icon>
                     <div class="center">
-                        <form [formGroup]="personForm">
-                            <mat-form-field>
-                                <input matInput type="number" formControlName="numberOfPeople"
-                                    placeholder="Número de personas">
-                            </mat-form-field>
-                            <br>
-                            <h6>Elije la fecha de asistencia</h6>
-                            <mat-checkbox formControlName="may23">23 de mayo</mat-checkbox>
-                            <br>
-                            <mat-checkbox formControlName="may24">24 de mayo</mat-checkbox>
+                        <div>
+                            <table mat-table [dataSource]="returnKeys()">
+                                <ng-container matColumnDef="type">
+                                    <th mat-header-cell *matHeaderCellDef>Tipo</th>
+                                    <td mat-cell *matCellDef="let price">{{ price }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="person">
+                                    <th mat-header-cell *matHeaderCellDef>Persona por día</th>
+                                    <td mat-cell *matCellDef="let price">{{ precios[price].persona | currency }}</td>
+                                </ng-container>
+                                <ng-container matColumnDef="combo">
+                                    <th mat-header-cell *matHeaderCellDef>5 personas o más por dos días cada una</th>
+                                    <td mat-cell *matCellDef="let price">{{ precios[price].combo*2 | currency }}</td>
+                                </ng-container>
+
+
+                                <tr mat-header-row *matHeaderRowDef="['type', 'person', 'combo']"></tr>
+                                <tr mat-row *matRowDef="let row; columns: ['type', 'person', 'combo'];"></tr>
+                            </table>
                             <br>
                             <div class="center">
-                                <button [disabled]="disabled" (click)="pagar()" class="get">Pagar</button>
-                            </div>
-                        </form>
+                            <form [formGroup]="personForm">
+                                <mat-form-field>
+                                    <input matInput type="number" formControlName="numberOfPeople"
+                                        placeholder="Número de personas">
+                                </mat-form-field>
+                                <br>
+                                <h6>Elije la fecha de asistencia</h6>
+                                <mat-checkbox formControlName="may23">23 de mayo</mat-checkbox>
+                                <br>
+                                <mat-checkbox formControlName="may24">24 de mayo</mat-checkbox>
+                                <br>
+                                <div class="center">
+                                    <button [disabled]="disabled" (click)="pagar()" class="get">Pagar</button>
+                                </div>
+                            </form>
+                        </div>
+                        </div>
+
                     </div>
                 </div>
 

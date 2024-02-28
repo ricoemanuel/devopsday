@@ -7,8 +7,9 @@
                     <div class="col"><mat-icon style="cursor: pointer;" (click)="generarPDF(entrada.id)">print</mat-icon></div>
                 </div>
                 <div #content [id]="entrada.id" class="entrada">
-                    <p [routerLink]="'/evento/'+entrada.evento" style="cursor: pointer; font-weight: bold;">
-                        {{entrada.eventoData?entrada.eventoData.nombre:'Ir al evento'}}</p>
+                    <div class="codigo" >
+                        <img src="../../../assets/logo.png" alt="">
+                    </div>
                     <div class="codigo" *ngIf="entrada.transaccion">
                         <img [src]="generateQRCodeBase64(entrada.id)" alt="">
                     </div>

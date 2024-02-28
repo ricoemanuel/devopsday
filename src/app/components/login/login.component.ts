@@ -26,8 +26,10 @@ export class LoginComponent implements AfterViewInit {
     contrasena: ['', Validators.required],
     confirmar: ['', Validators.required],
     telefono: ['', Validators.required],
-    entidad: [''],
-    nit: [''],
+    talla: ['', Validators.required],
+    empresa: [''],
+    cargo: [''],
+    ciudad: [''],
   });
   formularioLogin = this.formBuilder.group({
     correo: ['', Validators.required],
@@ -124,9 +126,11 @@ export class LoginComponent implements AfterViewInit {
             nombre: this.formularioSignUp.value.nombre,
             numero: this.formularioSignUp.value.numero,
             tipoCedula: this.formularioSignUp.value.tipoCedula,
-            nit:this.formularioSignUp.value.nit,
-            entidad:this.formularioSignUp.value.entidad,
-            telefono:this.formularioSignUp.value.telefono
+            empresa:this.formularioSignUp.value.empresa,
+            telefono:this.formularioSignUp.value.telefono,
+            cargo:this.formularioSignUp.value.cargo,
+            ciudad:this.formularioSignUp.value.ciudad,
+            talla:this.formularioSignUp.value.talla
           }, res.user.uid)
         this.redirect()
       }).catch((error) => {

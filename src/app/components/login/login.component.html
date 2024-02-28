@@ -45,6 +45,45 @@
         <div class="row">
           <div class="col">
             <mat-form-field>
+              <mat-label>Talla de camisa</mat-label>
+              <mat-select formControlName="talla">
+                <mat-option value="s">s</mat-option>
+                <mat-option value="m">m</mat-option>
+                <mat-option value="l">l</mat-option>
+                <mat-option value="xl">xl</mat-option>
+                <mat-option value="xxl">xxl</mat-option>
+                <mat-option value="xxxl">xxxl</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <mat-form-field>
+              <mat-label>Ciudad</mat-label>
+              <input type="text" matInput formControlName="ciudad">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <mat-form-field>
+              <mat-label>Empresa</mat-label>
+              <input type="text" matInput formControlName="empresa">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <mat-form-field>
+              <mat-label>Cargo</mat-label>
+              <input type="text" matInput formControlName="cargo">
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <mat-form-field>
               <mat-label>Correo</mat-label>
               <input type="email" matInput formControlName="correo">
             </mat-form-field>

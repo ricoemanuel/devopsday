@@ -41,6 +41,9 @@ export class MisComprasComponent implements OnInit {
 
     })
     this.firebase.getAuthState().subscribe(user => {
+      if(!user){
+        this.router.navigate(['/evento/'])
+      }
       this.firebase.getCurrentFacturas(user!.uid).subscribe(res => {
         this.data = res
         this.data.forEach(async (factura: any) => {

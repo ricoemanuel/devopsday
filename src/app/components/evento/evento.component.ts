@@ -58,7 +58,7 @@ export class EventoComponent implements OnInit {
   formTab: boolean = false
   comprar() {
     if (this.user) {
-      this.formTab = true
+      this.formTab = !this.formTab
     } else {
       this.router.navigate(['login'])
     }
