@@ -21,6 +21,7 @@ export class EventoComponent implements OnInit {
       "estado": 'activo'
     },
   }
+  codigos:any[]=[]
   constructor(private aRoute: ActivatedRoute,
     private firebase: FirebaseService,
     private modalService: BsModalService,
@@ -32,18 +33,25 @@ export class EventoComponent implements OnInit {
     this.personForm = this.formBuilder.group({
       numberOfPeople: ['', [Validators.required, Validators.min(1)]],
       may23: [false],
-      may24: [false]
+      may24: [false],
+      codigo:['']
     });
   }
 
   current: any
   user: any
+  uid!:string
   async ngOnInit(): Promise<void> {
     this.current = this.currentPrice()
     this.firebase.getAuthState().subscribe(async res => {
       if (res) {
-        this.user = res.uid
+        let userData=await this.firebase.getUser(res.uid)
+        this.uid=res.uid
+        this.user = userData
       }
+    })
+    this.firebase.getFacturasBycodigo().subscribe((res:any)=>{
+     this.codigos=res
     })
   }
   currentPrice() {
@@ -77,11 +85,14 @@ export class EventoComponent implements OnInit {
         price = this.precios[this.current].combo
       }
       let valor = numberOfPeople * price * (may23 && may24 ? 2 : 1)
-      let response = await this.wompi.generarLink(valor, this.user, description);
-      response.subscribe((async (res: any) => {
-        await this.firebase.registrarFactura(res.data.id, this.user, "devops day", numberOfPeople, valor, [may23, may24])
-        window.location.href = `https://checkout.wompi.co/l/${res.data.id}`
-      }))
+      if(this.codigos.length<=50){
+        valor=valor-(this.personForm.value.codigo==="CoDevospDays2024"?valor*(20/100):0)
+      }
+       let response = await this.wompi.generarLink(valor, this.user, description);
+       response.subscribe((async (res: any) => {
+         await this.firebase.registrarFactura(res.data.id, this.user,this.uid, "devops day", numberOfPeople, valor, [may23, may24], this.personForm.value.codigo)
+         window.location.href = `https://checkout.wompi.co/l/${res.data.id}`
+       }))
     } else {
       Swal.fire({
         icon: 'error',
@@ -92,7 +103,6 @@ export class EventoComponent implements OnInit {
     }
   }
   returnKeys() {
-    console.log(this.current)
     return Object.keys(this.precios)
   }
 

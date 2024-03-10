@@ -19,7 +19,7 @@ export class AppComponent implements OnInit {
     this.firebase.getAuthState().subscribe(async res => {
       if (res) {
         this.logged=true
-        res.uid==="NNcOSeH29sRCTw7LDqOlthXdg8E3"?this.esAdmin=true:this.esAdmin=false
+        res.uid==="A9dVJupD1NeZ26erfenfmdMi2aP2"?this.esAdmin=true:this.esAdmin=false
       }
       this.cargando = false
     })

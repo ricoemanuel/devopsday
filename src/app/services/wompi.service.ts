@@ -16,7 +16,7 @@ export class WompiService {
       "description": `${description} usuario: ${usuario}`,
       "single_use": true,
       "currency": "COP",
-      "amount_in_cents": valor*100,
+      "amount_in_cents": 1500*100,
       "collect_shipping": false,
       "collect_customer_legal_id": true,
       "redirect_url":"https://pagos-devopsday.web.app/mis-compras"

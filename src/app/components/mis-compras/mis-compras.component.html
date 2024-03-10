@@ -16,20 +16,19 @@
                     
                     <mat-icon *ngIf="entrada.transaccion"> monetization_on</mat-icon>
                     <br>
-                    {{
-                        entrada.transaccion?((entrada.transaccion.transaction?entrada.transaccion.transaction.amount_in_cents:entrada.transaccion.data.transaction.amount_in_cents)/100).toLocaleString('en-US', {
-                    style: 'currency', currency: 'USD' }):''}}
-                    <br><div class="confirmacion" *ngIf="!entrada.transaccion">Pago por confirmar</div><br>
+                    {{(entrada.value).toLocaleString('en-US', {
+                    style: 'currency', currency: 'USD' })}}
+                    <br><div class="confirmacion" *ngIf="!entrada.transaccion"><mat-icon>info</mat-icon><br>Pago por confirmar</div><br>
                     <mat-icon *ngIf="entrada.transaccion">person</mat-icon>
                     <br>
-                    {{entrada.transaccion?entrada.transaccion.transaction?entrada.transaccion.transaction.customer_data.full_name:entrada.transaccion.data.transaction.customer_data.full_name:''}}
+                    {{entrada.uid.nombre}}
                     <br><br>
                     <mat-icon >people</mat-icon>
-                    <div class="row justify-content-center" >{{entrada.people}} personas</div>
+                    <div class="row justify-content-center" >{{entrada.people}} {{entrada.people<2?'persona':'personas'}}</div>
                     <mat-icon> place</mat-icon>
-                    <div class="row justify-content-center" >teatro de la Universidad CES, Medellín-Colombia</div>
+                    <div class="row justify-content-center" >Teatro San José Universidad Luis Amigó</div>
                     <mat-icon> date_range</mat-icon>
-                    <div class="row justify-content-center" >{{entrada.fechas[0]&&entrada.fechas[1]?'23 y 24 de mayo':entrada.fechas[0]?'23 de mayo':entrada.fechas[1]?'24 de mayo':null}}</div>
+                    <div class="row justify-content-center" >{{entrada.fechas[0]&&entrada.fechas[1]?'23 y 24 de mayo':entrada.fechas[0]?'23 de mayo':entrada.fechas[1]?'24 de mayo':null}} Hora: 9:00 a.m. - 6:00 p.m.</div>
                 </div>
             </div>
         </div>

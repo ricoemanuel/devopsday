@@ -90,21 +90,26 @@
           </div>
         </div>
         <div class="row">
-          <div class="col">
-            <mat-form-field>
-              <mat-label>Contraseña</mat-label>
-              <input type="password" matInput formControlName="contrasena">
-            </mat-form-field>
+          <div class="col tratamiento-datos">
+            <mat-checkbox formControlName="tratamientoDatos">
+              Acepto el tratamiento de mis datos personales
+            </mat-checkbox>
           </div>
         </div>
+        <hr>
         <div class="row">
-          <div class="col">
-            <mat-form-field>
-              <mat-label>Confirmar contraseña</mat-label>
-              <input type="password" matInput formControlName="confirmar">
-            </mat-form-field>
+          <div class="col consentimiento-ofertas">
+            <div class="agradecimiento-ofertas">
+              <p>¡Gracias por registrarte en DevOpsDays Medellín 2024!</p>
+              <p>Nos encantaría consentirte con increíbles beneficios y oportunidades exclusivas. Al hacer clic en "Opt-In", aceptas recibir ofertas especiales de nuestros colaboradores, incluyendo vouchers de certificación, accesos gratuitos a plataformas, y otras sorpresas tecnológicas.</p>
+              <p>¡No te pierdas esta oportunidad de potenciar tu carrera! Opta por recibir estas oportunidades exclusivas y prepárate para llevar tus habilidades al siguiente nivel.</p>
+            </div>
+            <mat-checkbox formControlName="optIn">
+              Sí, quiero aprovechar estas ofertas especiales y beneficios exclusivos.
+            </mat-checkbox>
           </div>
         </div>
+      <br><hr>
         <button *ngIf="!disabled" class="submit" type="submit" (click)="registro()">Registrarse</button>
         <button *ngIf="disabled" class="disabled" type="submit">Registrarse</button>
         <p class="message">¿Ya tienes cuenta? <a (click)="switch('registrarse')" style="cursor: pointer;">Inicia
@@ -119,7 +124,7 @@
         </div>
         <div class="row">
           <mat-form-field>
-            <mat-label>Contraseña</mat-label>
+            <mat-label>Cédula</mat-label>
             <input type="password" matInput formControlName="contrasena">
           </mat-form-field>
         </div>

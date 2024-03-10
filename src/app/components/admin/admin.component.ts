@@ -5,6 +5,7 @@ import { FirebaseService } from 'src/app/services/firebase.service';
 import * as QRCode from 'qrcode-generator';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin',
@@ -14,11 +15,12 @@ import Swal from 'sweetalert2';
 export class AdminComponent implements OnInit, AfterViewInit {
   dataSource: MatTableDataSource<any>
   baseSeleccionada = ""
-  displayedColumns: string[] = ['QR', 'Valor', 'Nombre', 'transaccion', 'fecha', 'celular', 'correo', 'acciones'];
+  displayedColumns: string[] = ['cedula', 'empresa', 'talla', 'Valor', 'Nombre', 'transaccion', 'fecha', 'celular', 'correo','codigo', 'acciones'];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   spinner!: boolean;
   constructor(private firebase: FirebaseService,
     private modalService: BsModalService,
+    private router: Router
   ) {
     this.dataSource = new MatTableDataSource<any>();
     this.dataSource.paginator = this.paginator;
@@ -26,9 +28,8 @@ export class AdminComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
   }
-  formatfecha(fecha: string) {
-
-    const fechaDate = new Date(fecha);
+  formatFecha(fechaObjeto: any) {
+    const fechaDate = new Date(fechaObjeto.seconds * 1000 + fechaObjeto.nanoseconds / 1000000);
 
     // Obtener el nombre del día
     const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -44,21 +45,27 @@ export class AdminComponent implements OnInit, AfterViewInit {
     const minutos = fechaDate.getUTCMinutes().toString().padStart(2, '0');
 
     const formatoDeseado = `${nombreDia}, ${dia}/${mes}/${año} ${hora}:${minutos}`;
-    return formatoDeseado
-
-
+    return formatoDeseado;
   }
+  data:any
   async ngOnInit(): Promise<void> {
     this.spinner = true
     this.firebase.getAuthState().subscribe(user => {
-      if (user!.uid === "qSt9YQZVukPBeEvtxk28T98JhzG2") {
-        this.firebase.getFacturas().subscribe(res => {
-          let data = res.filter((fac:any)=>fac.estado==='cancelado')
-         
-          this.dataSource.data = data
-          this.dataSource.paginator = this.paginator;
-        })
+      if (user) {
+        if (user!.uid === "A9dVJupD1NeZ26erfenfmdMi2aP2") {
+          this.firebase.getFacturas().subscribe(res => {
+            let data = res
+            this.data=JSON.parse(JSON.stringify(data))
+            this.dataSource.data = data
+            this.dataSource.paginator = this.paginator;
+          })
+        } else {
+          this.router.navigate(["evento"])
+        }
+      } else {
+        this.dataSource.data = []
       }
+
     })
 
   }
@@ -71,9 +78,7 @@ export class AdminComponent implements OnInit, AfterViewInit {
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+
   }
   openQR(codigo: string, template: TemplateRef<any>) {
     this.baseSeleccionada = codigo
@@ -191,5 +196,15 @@ export class AdminComponent implements OnInit, AfterViewInit {
         })
       }
     })
+  }
+  onChange($event:any){
+    if($event!=='todos'){
+      this.dataSource.data=this.data.filter((fac:any)=>fac.estado===$event)
+    }else{
+      console.log(this.data)
+      this.dataSource.data=this.data
+    }
+    
+    
   }
 }

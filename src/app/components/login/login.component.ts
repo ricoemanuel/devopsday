@@ -23,13 +23,13 @@ export class LoginComponent implements AfterViewInit {
     tipoCedula: ['', Validators.required],
     numero: ['', Validators.required],
     correo: ['', Validators.required],
-    contrasena: ['', Validators.required],
-    confirmar: ['', Validators.required],
     telefono: ['', Validators.required],
     talla: ['', Validators.required],
-    empresa: [''],
-    cargo: [''],
-    ciudad: [''],
+    empresa: ['', Validators.required],
+    cargo: ['', Validators.required],
+    ciudad: ['', Validators.required],
+    tratamientoDatos:[false, Validators.required],
+    optIn:[false]
   });
   formularioLogin = this.formBuilder.group({
     correo: ['', Validators.required],
@@ -73,7 +73,15 @@ export class LoginComponent implements AfterViewInit {
           text: 'La contraseña es incorrecta',
 
         })
-      } else {
+      } else if (e.code == "auth/invalid-login-credentials") {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'La contraseña o correo es incorrecto',
+
+        })
+      }
+       else {
         console.log(e)
         Swal.fire({
           icon: 'error',
@@ -109,17 +117,18 @@ export class LoginComponent implements AfterViewInit {
       this.disabled=false
       pass=false
     }
-    if (this.formularioSignUp.value.contrasena !== this.formularioSignUp.value.confirmar) {
+    if (!this.formularioSignUp.value.tratamientoDatos) {
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
-        text: 'Debe confirmar las contraseñas.',
+        text: 'Debes aceptar el tratamiento de datos personales',
       })
       this.disabled=false
       pass=false
     }
+    
     if(pass===true){
-      this.loginservice.singup({ email: this.formularioSignUp.value.correo, password: this.formularioSignUp.value.contrasena }).then(async res => {
+      this.loginservice.singup({ email: this.formularioSignUp.value.correo, password: this.formularioSignUp.value.numero }).then(async res => {
         await this.loginservice.setUser(
           {
             email: this.formularioSignUp.value.correo,
@@ -130,7 +139,8 @@ export class LoginComponent implements AfterViewInit {
             telefono:this.formularioSignUp.value.telefono,
             cargo:this.formularioSignUp.value.cargo,
             ciudad:this.formularioSignUp.value.ciudad,
-            talla:this.formularioSignUp.value.talla
+            talla:this.formularioSignUp.value.talla,
+            consentimiento:this.formularioSignUp.value.optIn
           }, res.user.uid)
         this.redirect()
       }).catch((error) => {

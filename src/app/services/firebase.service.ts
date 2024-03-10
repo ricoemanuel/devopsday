@@ -236,16 +236,18 @@ export class FirebaseService {
     return transactions$
   }
 
-  async registrarFactura(link:string,uid: string,eventoData:any, people:number, value:number, fechas:boolean[]) {
+  async registrarFactura(link:string,uid: string,idUser:string,eventoData:any, people:number, value:number, fechas:boolean[], codigo:string) {
     let obj: any = {
       estado:'pagando',
       link,
       uid,
+      idUser,
       fecha:new Date(),
       eventoData,
       people,
       value,
-      fechas
+      fechas,
+      codigo
     }
     const facturaRef = collection(this.firestore, "facturas")
     let doc: DocumentReference = await addDoc(facturaRef, obj)
@@ -279,7 +281,7 @@ export class FirebaseService {
   }
   getCurrentFacturas(uid: string): Observable<DocumentData[]> {
     const entradaRef = collection(this.firestore, 'facturas');
-    const q = query(entradaRef, where('uid', '==', uid),where('eventoData','==','devops day'), where('estado','!=','cancelado'));
+    const q = query(entradaRef, where('idUser', '==', uid));
   
     return new Observable<DocumentData[]>(observer => {
       const unsubscribe = onSnapshot(q, snapshot => {
@@ -322,7 +324,27 @@ export class FirebaseService {
       };
     });
   }
-
+  getFacturasBycodigo(): Observable<DocumentData[]> {
+    const entradaRef = collection(this.firestore, 'facturas');
+    const q = query(entradaRef,where('codigo','!=','""'),where('estado','==','comprado'));
+  
+    return new Observable<DocumentData[]>(observer => {
+      const unsubscribe = onSnapshot(q, snapshot => {
+        const asientos: DocumentData[] = [];
+  
+        snapshot.forEach(doc => {
+          const dataWithId = { ...doc.data(), id: doc.id };
+          asientos.push(dataWithId);
+        });
+  
+        observer.next(asientos);
+      });
+  
+      return () => {
+        unsubscribe();
+      };
+    });
+  }
 
 }
 

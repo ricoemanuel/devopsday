@@ -106,14 +106,7 @@ export class MisComprasComponent implements OnInit {
 
     })
 
-    Swal.fire({
-      position: 'top-end',
-      icon: 'info',
-      title: 'Validando compra, por favor espere, Esto puede demorar un par de minutos',
-      showConfirmButton: false,
-
-    })
-
+    
     this.firebase.transactions().subscribe(async res => {
       let iterable = Object.entries(res);
       let array: any[] = [];
@@ -156,24 +149,12 @@ export class MisComprasComponent implements OnInit {
         }
         else {
 
-          Swal.fire({
-            position: 'top-end',
-            icon: 'error',
-            title: 'La transacción aún no ha sido confirmada',
-            showConfirmButton: false,
-            timer: 2000
-          })
+          
         }
 
       } else {
 
-        Swal.fire({
-          position: 'top-end',
-          icon: 'error',
-          title: 'La transacción no ha sido confirmada, comunícate con tu banco.',
-          showConfirmButton: false,
-          timer: 2000
-        })
+       
       }
     })
   }

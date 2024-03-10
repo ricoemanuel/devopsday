@@ -3,7 +3,7 @@
         <span>Eventos MyTicket</span>
         <span class="example-spacer"></span>
         <mat-icon class="down" *ngIf="logged" style="cursor: pointer;" routerLink="/mis-compras">download</mat-icon>
-        <p *ngIf="logged" class="text">Ticket virtual</p>
+        <p *ngIf="logged" class="text">Descargar Ticket</p>
         <mat-icon style="cursor: pointer;" routerLink="/evento/">home</mat-icon>
         <mat-icon [matMenuTriggerFor]="menu" style="cursor: pointer;" class="logout">person_pin</mat-icon>
         <mat-menu #menu="matMenu">

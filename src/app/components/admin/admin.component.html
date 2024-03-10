@@ -1,9 +1,15 @@
 <br>
-<div class="buscador">
-    <mat-form-field appearance="outline">
-        <mat-label>Escriba su búsqueda</mat-label>
-        <input matInput (keyup)="applyFilter($event)" #input>
+<div class="centrar">
+    <mat-form-field>
+        <mat-label>Estado</mat-label>
+        <mat-select (valueChange)="onChange($event)" value="todos">
+            <mat-option value="comprado">Pagado</mat-option>
+            <mat-option value="cancelado">Cancelado</mat-option>
+            <mat-option value="pagando">en proceso</mat-option>
+            <mat-option value="todos">Todo</mat-option>
+        </mat-select>
     </mat-form-field>
+    
 </div>
 
 <div class="centrar">
@@ -12,15 +18,7 @@
 <div class="mat-elevation-z8 overflow-auto col-md-11 datatable">
     <table matTableExporter #exporter="matTableExporter" mat-table [dataSource]="dataSource" matSort>
 
-        <ng-container matColumnDef="QR">
-            <mat-header-cell *matHeaderCellDef> Código qr </mat-header-cell>
-            <mat-cell *matCellDef="let elemento">
-                <div class="qr">
-                    <p (click)="openModal(template)">{{elemento.id}}</p>
-                </div>
-
-            </mat-cell>
-        </ng-container>
+        
 
         <ng-container matColumnDef="Evento">
             <mat-header-cell *matHeaderCellDef> Evento </mat-header-cell>
@@ -33,7 +31,7 @@
         <ng-container matColumnDef="Valor">
             <mat-header-cell *matHeaderCellDef> Valor </mat-header-cell>
             <mat-cell *matCellDef="let elemento"> {{
-                ((elemento.value)/100).toLocaleString('en-US', {
+                ((elemento.value)).toLocaleString('en-US', {
                 style: 'currency', currency: 'USD' })}}
             </mat-cell>
         </ng-container>
@@ -41,7 +39,7 @@
             <mat-header-cell *matHeaderCellDef> Nombre </mat-header-cell>
             <mat-cell *matCellDef="let elemento"> {{
 
-                (elemento.transaccion.transaction.customer_data.full_name)
+                (elemento.uid.nombre)
                }}
             </mat-cell>
         </ng-container>
@@ -49,29 +47,53 @@
         <ng-container matColumnDef="transaccion">
             <mat-header-cell *matHeaderCellDef>Número de transacción</mat-header-cell>
             <mat-cell *matCellDef="let elemento">
-                {{elemento.transaccion.transaction.id}}
+                {{elemento.transaccion?.transaction.id}}
             </mat-cell>
         </ng-container>
         <ng-container matColumnDef="fecha">
             <mat-header-cell *matHeaderCellDef>Fecha de transacción</mat-header-cell>
             <mat-cell *matCellDef="let elemento">
-                {{formatfecha(elemento.transaccion.transaction.finalized_at)}}
+                {{formatFecha(elemento.fecha)}}
             </mat-cell>
         </ng-container>
         <ng-container matColumnDef="celular">
             <mat-header-cell *matHeaderCellDef>Celular</mat-header-cell>
             <mat-cell *matCellDef="let elemento">
-                {{elemento.transaccion.data?elemento.transaccion.data.transaction.customer_data.phone_number:elemento.transaccion.transaction.customer_data.phone_number}}
+                {{elemento.uid.telefono}}
             </mat-cell>
         </ng-container>
         <ng-container matColumnDef="correo">
             <mat-header-cell *matHeaderCellDef>Correo</mat-header-cell>
             <mat-cell *matCellDef="let elemento">
-                {{elemento.transaccion.transaction.customer_email}}
+                {{elemento.uid.email}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="cedula">
+            <mat-header-cell *matHeaderCellDef>Cédula</mat-header-cell>
+            <mat-cell *matCellDef="let elemento">
+                {{elemento.uid.numero}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="empresa">
+            <mat-header-cell *matHeaderCellDef>Empresa</mat-header-cell>
+            <mat-cell *matCellDef="let elemento">
+                {{elemento.uid.empresa}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="talla">
+            <mat-header-cell *matHeaderCellDef>Talla</mat-header-cell>
+            <mat-cell *matCellDef="let elemento">
+                {{elemento.uid.talla}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="codigo">
+            <mat-header-cell *matHeaderCellDef>Código</mat-header-cell>
+            <mat-cell *matCellDef="let elemento">
+                {{elemento.codigo}}
             </mat-cell>
         </ng-container>
         <ng-container matColumnDef="acciones">
-            <mat-header-cell *matHeaderCellDef>Correo</mat-header-cell>
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
             <mat-cell *matCellDef="let elemento">
                 <div class="col" *ngIf="elemento.estado==='pagando'"><mat-icon style="cursor: pointer;" (click)="verificar(elemento.link)">cached</mat-icon></div>
             </mat-cell>
