@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import Swal from 'sweetalert2';
 
@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements AfterViewInit {
+export class LoginComponent implements AfterViewInit, OnInit {
   spinner: boolean = true
   correo = ""
   contrasena = ""
@@ -25,8 +25,8 @@ export class LoginComponent implements AfterViewInit {
     correo: ['', Validators.required],
     telefono: ['', Validators.required],
     talla: ['', Validators.required],
-    empresa: ['', Validators.required],
-    cargo: ['', Validators.required],
+    empresa: ['',],
+    cargo: ['',],
     ciudad: ['', Validators.required],
     tratamientoDatos:[false, Validators.required],
     optIn:[false]
@@ -36,12 +36,20 @@ export class LoginComponent implements AfterViewInit {
     contrasena: ['', Validators.required],
   });
   disabled!: boolean;
-  constructor(private formBuilder: FormBuilder, private router: Router, private loginservice: FirebaseService) { }
+  queryParams:any
+  constructor(private route: ActivatedRoute,private formBuilder: FormBuilder, private router: Router, private loginservice: FirebaseService) { }
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(async params => {
+      if (params["redirect"]) {
+        this.queryParams = {comprar:'true'}
+      }
+    })
+  }
   ngAfterViewInit(): void {
     this.spinner = false
   }
   redirect() {
-    this.router.navigate(['evento'])
+    this.router.navigate(['evento'],{queryParams:this.queryParams})
   }
   async iniciar() {
     this.spinner = true

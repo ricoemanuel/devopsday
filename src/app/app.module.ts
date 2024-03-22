@@ -41,6 +41,7 @@ import { MisComprasComponent } from './components/mis-compras/mis-compras.compon
 import { AdminComponent } from './components/admin/admin.component';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
+import { MatTabsModule } from '@angular/material/tabs';
 @NgModule({
   declarations: [
     AppComponent,
@@ -72,6 +73,7 @@ import { MatCardModule } from '@angular/material/card';
     HttpClientModule,
     MatTooltipModule,
     MatCardModule,
+    MatTabsModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),

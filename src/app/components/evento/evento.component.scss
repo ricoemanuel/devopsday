@@ -154,7 +154,7 @@ table {
 }
 
 
-.tarima{
+.tarima {
     margin: 0 auto;
     width: 80%;
     background-color: #3f51b5;
@@ -162,18 +162,28 @@ table {
     text-align: center;
     color: white;
 }
+
 .mensaje_404 {
     text-align: center;
-    font-size: 24px; /* Tamaño de fuente grande */
-    padding: 20px; /* Espaciado interno */
-    border: 2px solid #ccc; /* Borde opcional */
-    border-radius: 10px; /* Borde redondeado opcional */
-    max-width: 400px; /* Ancho máximo del div */
-    margin: 0 auto; /* Centrar horizontalmente */
-    margin-bottom: 10px; /* Espaciado superior para centrar verticalmente */
-    background-color: #f0f0f0; /* Color de fondo opcional */
+    font-size: 24px;
+    /* Tamaño de fuente grande */
+    padding: 20px;
+    /* Espaciado interno */
+    border: 2px solid #ccc;
+    /* Borde opcional */
+    border-radius: 10px;
+    /* Borde redondeado opcional */
+    max-width: 400px;
+    /* Ancho máximo del div */
+    margin: 0 auto;
+    /* Centrar horizontalmente */
+    margin-bottom: 10px;
+    /* Espaciado superior para centrar verticalmente */
+    background-color: #f0f0f0;
+    /* Color de fondo opcional */
 }
-.get{
+
+.get {
     background-color: #0b133b;
     color: white;
     padding: 7px;
@@ -181,8 +191,41 @@ table {
     padding-left: 20px;
     padding-right: 20px;
 }
-.center{
+
+.get:disabled {
+    background-color: gray;
+    cursor: not-allowed;
+}
+
+.center {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.users {
+    & mat-tab-group {
+        width: 90vw;
+
+        @media (min-width: 768px) {
+            width: 800px;
+        }
+    }
+}
+
+mat-stepper {
+    width: 93vw;
+}
+
+mat-form-field {
+    width: 100%;
+}
+
+.consentimiento-ofertas {
+    text-align: justify;
+}
+
+.table-price {
+    width: 100%;
+    overflow: auto;
 }

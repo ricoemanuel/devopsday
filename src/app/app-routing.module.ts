@@ -8,13 +8,13 @@ import { AdminComponent } from './components/admin/admin.component';
 
 //Components
 const routes: Routes = [
-  {path:'evento/:id',component:EventoComponent},
+  {path:'evento',component:EventoComponent},
   {path:'login',component:LoginComponent},
   {path:'mis-compras',component:MisComprasComponent},
   {path:'ventas',component:AdminComponent},
   {
     path: '**', // El wildcard '**' atrapa cualquier ruta que no coincida con las rutas anteriores
-    redirectTo: '/evento/', // Redirige a la ruta deseada
+    redirectTo: '/evento', // Redirige a la ruta deseada
   },
 ];
 
